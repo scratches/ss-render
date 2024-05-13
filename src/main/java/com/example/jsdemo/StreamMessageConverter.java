@@ -13,6 +13,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestAttributesThreadLocalAccessor;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import io.micrometer.context.ContextRegistry;
@@ -27,7 +28,7 @@ public class StreamMessageConverter
 
 	public StreamMessageConverter() {
 		Hooks.enableAutomaticContextPropagation();
-		ContextRegistry.getInstance().registerThreadLocalAccessor(new RequestContextHolderAccessor());
+		ContextRegistry.getInstance().registerThreadLocalAccessor(new RequestAttributesThreadLocalAccessor());
 	}
 
 	class RequestContextHolderAccessor implements ThreadLocalAccessor<RequestAttributes> {
@@ -86,7 +87,7 @@ public class StreamMessageConverter
 		RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
 		log.info("Writing " + rendering + " for " + attrs);
 		try {
-			outputMessage.getBody().write(("<span> Hello " + rendering.getValue() + "</span>").getBytes());
+			outputMessage.getBody().write(("<span>Hello " + rendering.getValue() + "</span>").getBytes());
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
